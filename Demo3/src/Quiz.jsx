@@ -15,6 +15,41 @@ const questions = [
     question: "What does CSS stand for?",
     options: ["Colorful Style Sheet", "Cascading Style Sheet", "Creative Style System", "Computer Style Sheet"],
     answer: "Cascading Style Sheet"
+  },
+  {
+    question: "Which of these is NOT a JavaScript framework?",
+    options: ["React", "Angular", "Django", "Vue"],
+    answer: "Django"
+  },
+  {
+    question: "What is the correct way to write a JavaScript array?",
+    options: [
+      "var colors = (1:'red', 2:'green', 3:'blue')",
+      "var colors = ['red', 'green', 'blue']",
+      "var colors = 'red', 'green', 'blue'",
+      "var colors = 1 = ('red'), 2 = ('green'), 3 = ('blue')"
+    ],
+    answer: "var colors = ['red', 'green', 'blue']"
+  },
+  {
+    question: "Which HTML element is used to create a hyperlink?",
+    options: ["<link>", "<a>", "<href>", "<url>"],
+    answer: "<a>"
+  },
+  {
+    question: "What is the correct way to write a JavaScript comment?",
+    options: [
+      "<!--This is a comment-->",
+      "//This is a comment",
+      "/*This is a comment*/",
+      "Both B and C"
+    ],
+    answer: "Both B and C"
+  },
+  {
+    question: "Which of these is a valid way to declare a variable in JavaScript?",
+    options: ["variable x = 5;", "v x = 5;", "let x = 5;", "x = 5;"],
+    answer: "let x = 5;"
   }
 ];
 

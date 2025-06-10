@@ -99,11 +99,6 @@ function Login_Signup() {
                     </form>
 
                     <p className="mt-10 text-center text-sm/6 text-gray-500">
-                        Use these credentials to login:
-                        <br />
-                        Email: test@example.com
-                        <br />
-                        Password: password123
                     </p>
                 </div>
             </div>
