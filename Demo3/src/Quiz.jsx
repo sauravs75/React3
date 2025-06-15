@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 const questions = [
   {
     question: "What is the capital of France?",
-    options: ["Berlin", "London", "Paris", "Madrid"],
+    options: ["Berlin" , "London", "Paris", "Madrid"],
     answer: "Paris"
   },
   {
