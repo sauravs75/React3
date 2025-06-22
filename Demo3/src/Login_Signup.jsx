@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { authService } from './services/authService';
 
 function Login_Signup() {
@@ -6,6 +7,7 @@ function Login_Signup() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -14,8 +16,8 @@ function Login_Signup() {
 
         try {
             await authService.login(email, password);
-            // Redirect to Quiz page after successful login
-            window.location.href = '/Quiz';
+            // Redirect to Progress page after successful login
+            navigate('/progress');
         } catch (err) {
             setError('Invalid email or password');
         } finally {

@@ -51,7 +51,7 @@ function Footer() {
                             <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider dark:text-white mb-4">Quick Links</h3>
                             <ul class="space-y-2">
                                 <li><a href="/Quiz" class="text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400">Take Quiz</a></li>
-                                <li><a href="#" class="text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400">Leaderboard</a></li>
+                                <li><a href="/leaderboard" class="text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400">Leaderboard</a></li>
                                 <li><a href="#" class="text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400">My Progress</a></li>
                                 <li><a href="/login" class="text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400">Login</a></li>
                                 <li><a href="#" class="text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400">Help Center</a></li>
