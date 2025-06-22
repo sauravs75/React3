@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getQuestionsByCategory, getAllQuestions, getRandomQuestions } from './data/questions';
+import { dataService } from './services/dataService';
+import { authService } from './services/authService';
 
 const Quiz = () => {
   const location = useLocation();
@@ -15,6 +17,19 @@ const Quiz = () => {
   const [userName, setUserName] = useState('');
   const [showNamePrompt, setShowNamePrompt] = useState(false);
   const [categoryToStart, setCategoryToStart] = useState(null);
+
+  // Check authentication on component mount
+  useEffect(() => {
+    if (!authService.isAuthenticated()) {
+      navigate('/login', { state: { from: '/Quiz' } });
+      return;
+    }
+  }, [navigate]);
+
+  // If not authenticated, don't render anything
+  if (!authService.isAuthenticated()) {
+    return null;
+  }
 
   const categories = [
     { name: "JavaScript", icon: "💻", color: "bg-gradient-to-br from-yellow-400 to-orange-500" },
@@ -80,15 +95,21 @@ const Quiz = () => {
   };
 
   const saveScore = () => {
-    const newScore = {
+    const quizData = {
       name: userName,
       score: score,
       category: selectedCategory,
-      date: new Date().toISOString(),
+      totalQuestions: questions.length,
+      percentage: Math.round((score / questions.length) * 100)
     };
-    const existingScores = JSON.parse(localStorage.getItem('leaderboard')) || [];
-    existingScores.push(newScore);
-    localStorage.setItem('leaderboard', JSON.stringify(existingScores));
+    
+    const success = dataService.saveQuizResult(quizData);
+    
+    if (success) {
+      console.log('Quiz result saved successfully');
+    } else {
+      console.error('Failed to save quiz result');
+    }
   };
   
   const resetQuiz = () => {

@@ -1,8 +1,22 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { authService } from '../services/authService';
 
 const Categories = () => {
     const navigate = useNavigate();
+
+    // Check authentication on component mount
+    React.useEffect(() => {
+        if (!authService.isAuthenticated()) {
+            navigate('/login', { state: { from: '/categories' } });
+            return;
+        }
+    }, [navigate]);
+
+    // If not authenticated, don't render anything
+    if (!authService.isAuthenticated()) {
+        return null;
+    }
 
     const categories = [
         {

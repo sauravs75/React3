@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { dataService } from '../services/dataService';
+import { authService } from '../services/authService';
 
 const Progress = () => {
   const [progressData, setProgressData] = useState({
@@ -9,10 +12,27 @@ const Progress = () => {
     performanceByCategory: [],
     recentQuizzes: []
   });
+  const [showDataOptions, setShowDataOptions] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Get real data from localStorage
-    const leaderboardData = JSON.parse(localStorage.getItem('leaderboard')) || [];
+    // Check authentication first
+    if (!authService.isAuthenticated()) {
+      navigate('/login', { state: { from: '/progress' } });
+      return;
+    }
+    
+    loadProgressData();
+  }, [navigate]);
+
+  // If not authenticated, don't render anything
+  if (!authService.isAuthenticated()) {
+    return null;
+  }
+
+  const loadProgressData = () => {
+    // Get real data from dataService
+    const leaderboardData = dataService.getQuizResults();
     
     if (leaderboardData.length === 0) {
       return;
@@ -21,8 +41,7 @@ const Progress = () => {
     // Calculate overall statistics
     const totalQuizzes = leaderboardData.length;
     const totalQuestions = leaderboardData.reduce((sum, quiz) => {
-      // Estimate total questions based on category (assuming 10 questions per quiz)
-      return sum + 10;
+      return sum + (quiz.totalQuestions || 10);
     }, 0);
     const totalCorrect = leaderboardData.reduce((sum, quiz) => sum + quiz.score, 0);
     const averageScore = Math.round((totalCorrect / totalQuestions) * 100);
@@ -39,7 +58,7 @@ const Progress = () => {
       }
       categoryStats[quiz.category].quizzes += 1;
       categoryStats[quiz.category].totalScore += quiz.score;
-      categoryStats[quiz.category].totalQuestions += 10; // Assuming 10 questions per quiz
+      categoryStats[quiz.category].totalQuestions += (quiz.totalQuestions || 10);
     });
 
     const performanceByCategory = Object.entries(categoryStats).map(([category, stats]) => ({
@@ -54,10 +73,10 @@ const Progress = () => {
       .sort((a, b) => new Date(b.date) - new Date(a.date))
       .slice(0, 5)
       .map(quiz => ({
-        id: quiz.date,
+        id: quiz.id || quiz.date,
         category: quiz.category,
         score: quiz.score,
-        totalQuestions: 10, // Assuming 10 questions per quiz
+        totalQuestions: quiz.totalQuestions || 10,
         date: new Date(quiz.date).toLocaleDateString()
       }));
 
@@ -69,7 +88,7 @@ const Progress = () => {
       performanceByCategory,
       recentQuizzes
     });
-  }, []);
+  };
 
   const getCategoryColor = (category) => {
     const colors = {
@@ -82,6 +101,51 @@ const Progress = () => {
       'Random Mix': 'bg-pink-500'
     };
     return colors[category] || 'bg-gray-500';
+  };
+
+  const handleExportData = () => {
+    const success = dataService.exportData();
+    if (success) {
+      alert('Data exported successfully!');
+    } else {
+      alert('Failed to export data.');
+    }
+  };
+
+  const handleImportData = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const success = dataService.importData(e.target.result);
+        if (success) {
+          alert('Data imported successfully!');
+          loadProgressData(); // Reload the data
+        } else {
+          alert('Failed to import data. Please check the file format.');
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const handleClearData = () => {
+    if (window.confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
+      const success = dataService.clearAllData();
+      if (success) {
+        alert('All data cleared successfully!');
+        setProgressData({
+          totalQuizzes: 0,
+          totalQuestions: 0,
+          totalCorrect: 0,
+          averageScore: 0,
+          performanceByCategory: [],
+          recentQuizzes: []
+        });
+      } else {
+        alert('Failed to clear data.');
+      }
+    }
   };
 
   // If no data exists, show a message
@@ -127,6 +191,44 @@ const Progress = () => {
           <p className="text-xl text-gray-300">
             Here's your quiz performance based on {progressData.totalQuizzes} completed quizzes!
           </p>
+          
+          {/* Data Management Buttons */}
+          <div className="mt-6 flex justify-center space-x-4">
+            <button
+              onClick={() => setShowDataOptions(!showDataOptions)}
+              className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all duration-200 border border-white/20"
+            >
+              Data Options
+            </button>
+          </div>
+          
+          {showDataOptions && (
+            <div className="mt-4 bg-white/10 backdrop-blur-lg rounded-lg p-4 border border-white/20">
+              <div className="flex flex-wrap justify-center gap-3">
+                <button
+                  onClick={handleExportData}
+                  className="bg-green-500/50 hover:bg-green-500/70 text-white px-4 py-2 rounded-lg transition-all duration-200"
+                >
+                  📤 Export Data
+                </button>
+                <label className="bg-blue-500/50 hover:bg-blue-500/70 text-white px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer">
+                  📥 Import Data
+                  <input
+                    type="file"
+                    accept=".json"
+                    onChange={handleImportData}
+                    className="hidden"
+                  />
+                </label>
+                <button
+                  onClick={handleClearData}
+                  className="bg-red-500/50 hover:bg-red-500/70 text-white px-4 py-2 rounded-lg transition-all duration-200"
+                >
+                  🗑️ Clear Data
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Overall Stats */}

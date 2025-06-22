@@ -1,7 +1,36 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { authService } from './services/authService';
 
 function NavBar() {
+    const [isOpen, setIsOpen] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [currentUser, setCurrentUser] = useState(null);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        // Check authentication status on mount and when it changes
+        const checkAuth = () => {
+            const authenticated = authService.isAuthenticated();
+            const user = authService.getCurrentUser();
+            setIsAuthenticated(authenticated);
+            setCurrentUser(user);
+        };
+
+        checkAuth();
+        // Listen for storage changes (when user logs in/out in another tab)
+        window.addEventListener('storage', checkAuth);
+        
+        return () => window.removeEventListener('storage', checkAuth);
+    }, []);
+
+    const handleLogout = () => {
+        authService.logout();
+        setIsAuthenticated(false);
+        setCurrentUser(null);
+        navigate('/');
+    };
+
     return (
         <>
             <nav className="bg-white border-gray-200 dark:bg-gray-900">
@@ -23,19 +52,35 @@ function NavBar() {
                             <li>
                                 <Link to="/" className="block py-2 px-3 text-white bg-blue-700 rounded-sm md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500" aria-current="page">Home</Link>
                             </li>
-                            <li>
-                                <Link to="/Quiz" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Take Quiz</Link>
-                            </li>
                             
-                            <li>
-                                <Link to="/leaderboard" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Leaderboard</Link>
-                            </li>
-                            <li>
-                                <Link to="/progress" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">My Progress</Link>
-                            </li>
-                            <li>
-                                <Link to="/login" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Login/Signup</Link>
-                            </li>
+                            {isAuthenticated ? (
+                                <>
+                                    <li>
+                                        <Link to="/Quiz" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Take Quiz</Link>
+                                    </li>
+                                    <li>
+                                        <Link to="/categories" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Categories</Link>
+                                    </li>
+                                    <li>
+                                        <Link to="/leaderboard" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Leaderboard</Link>
+                                    </li>
+                                    <li>
+                                        <Link to="/progress" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">My Progress</Link>
+                                    </li>
+                                    <li>
+                                        <button
+                                            onClick={handleLogout}
+                                            className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                                        >
+                                            Logout
+                                        </button>
+                                    </li>
+                                </>
+                            ) : (
+                                <li>
+                                    <Link to="/login" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Login/Signup</Link>
+                                </li>
+                            )}
                         </ul>
                     </div>
                 </div>

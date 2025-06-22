@@ -1,10 +1,29 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { dataService } from '../services/dataService';
+import { authService } from '../services/authService';
 
 const Leaderboard = () => {
   const [leaderboardData, setLeaderboardData] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const storedScores = JSON.parse(localStorage.getItem('leaderboard')) || [];
+    // Check authentication first
+    if (!authService.isAuthenticated()) {
+      navigate('/login', { state: { from: '/leaderboard' } });
+      return;
+    }
+    
+    loadLeaderboardData();
+  }, [navigate]);
+
+  // If not authenticated, don't render anything
+  if (!authService.isAuthenticated()) {
+    return null;
+  }
+
+  const loadLeaderboardData = () => {
+    const storedScores = dataService.getQuizResults();
     const sortedScores = storedScores.sort((a, b) => b.score - a.score);
     
     const rankedScores = sortedScores.map((score, index) => ({
@@ -13,11 +32,18 @@ const Leaderboard = () => {
     }));
 
     setLeaderboardData(rankedScores);
-  }, []);
+  };
 
   const clearLeaderboard = () => {
-    localStorage.removeItem('leaderboard');
-    setLeaderboardData([]);
+    if (window.confirm('Are you sure you want to clear the leaderboard? This action cannot be undone.')) {
+      const success = dataService.clearAllData();
+      if (success) {
+        setLeaderboardData([]);
+        alert('Leaderboard cleared successfully!');
+      } else {
+        alert('Failed to clear leaderboard.');
+      }
+    }
   };
 
   const topThree = leaderboardData.slice(0, 3);

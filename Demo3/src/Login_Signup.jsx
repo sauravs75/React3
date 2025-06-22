@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { authService } from './services/authService';
 
 function Login_Signup() {
@@ -8,6 +8,10 @@ function Login_Signup() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Get the page user was trying to access, default to home page
+    const from = location.state?.from || '/';
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -16,8 +20,8 @@ function Login_Signup() {
 
         try {
             await authService.login(email, password);
-            // Redirect to Progress page after successful login
-            navigate('/progress');
+            // Redirect to the page user was trying to access, or home page as default
+            navigate(from, { replace: true });
         } catch (err) {
             setError('Invalid email or password');
         } finally {
