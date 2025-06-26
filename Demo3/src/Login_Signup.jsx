@@ -102,13 +102,14 @@ function Login_Signup() {
                                 {loading ? 'Signing in...' : 'Sign in'}
                             </button>
                         </div>
-                    </form>
 
-                    {/* Show mock credentials below the login option */}
-                    <div className="mt-6 text-center text-sm text-gray-500">
-                        <div>Demo Email: <span className="font-mono text-gray-700">test@example.com</span></div>
-                        <div>Demo Password: <span className="font-mono text-gray-700">password123</span></div>
-                    </div>
+                        {/* Demo credentials as a comment below the login button */}
+                        <div className="mt-2 flex flex-col items-center text-xs italic text-gray-400">
+                            {/* 🛈 */}
+                            <span>// Demo Email: <span className="font-mono">test@example.com</span></span>
+                            <span>// Demo Password: <span className="font-mono">password123</span></span>
+                        </div>
+                    </form>
 
                     <p className="mt-10 text-center text-sm/6 text-gray-500">
                     </p>
